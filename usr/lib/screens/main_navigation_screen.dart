@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:couldai_user_app/screens/home_screen.dart';
 import 'package:couldai_user_app/screens/add_item_screen.dart';
 import 'package:couldai_user_app/screens/profile_screen.dart';
+import 'package:couldai_user_app/screens/explore_screen.dart';
+import 'package:couldai_user_app/screens/my_trades_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -15,45 +17,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('Messages (Coming Soon)')), // Placeholder for Messages
-    const AddItemScreen(),
+    const ExploreScreen(),
+    const MyTradesScreen(),
+    const Scaffold(body: Center(child: Text('Messages Screen'))),
     const ProfileScreen(),
   ];
-
-  void _onItemTapped(int index) {
-    if (index == 2) {
-      // If "Add" is tapped, maybe push a modal instead of switching tabs?
-      // For now, let's just switch tabs, but typically "Add" is a modal.
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const AddItemScreen()),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: [
-          const HomeScreen(),
-          const Scaffold(body: Center(child: Text('Messages Screen'))),
-          // We don't actually show the AddItemScreen in the stack because we push it
-          // But we need a placeholder to keep indices aligned if we were using it as a tab
-          // However, since I'm pushing it, I'll just keep the index on the previous tab
-          // or handle it differently.
-          // Let's adjust the logic:
-          // 0: Home
-          // 1: Messages
-          // 2: Profile
-          // The FAB will be the "Add" button.
-          const ProfileScreen(),
-        ],
+        children: _screens,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
@@ -69,6 +44,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: 'Home',
           ),
           NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.swap_horiz_outlined),
+            selectedIcon: Icon(Icons.swap_horiz),
+            label: 'Trades',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.chat_bubble_outline),
             selectedIcon: Icon(Icons.chat_bubble),
             label: 'Messages',
@@ -80,15 +65,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddItemScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1 // Show FAB on Home and Explore
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddItemScreen()),
+                );
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
